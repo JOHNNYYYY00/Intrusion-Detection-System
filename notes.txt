@@ -1,0 +1,5 @@
+
+
+when compiling the program you need to end the gcc with -lpcap
+
+when compiling the program also use -lsystemd

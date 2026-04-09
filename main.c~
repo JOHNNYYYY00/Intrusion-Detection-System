@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <sys/socket.h>
+#include "network.h"
+#include <pcap.h>
+#include <string.h>
+int main(int argc, char *argv[]){
+
+	char *dev ; 
+	char errbuf[PCAP_ERRBUF_SIZE] ;  
+	dev = pcap_lookupdev(errbuf) ; 
+	char *ICMP = "icmp" ; 
+	struct bpf_program fp ; 
+	char filter_exp[]="port 22" ; 
+	bpf_u_int32 mask ; 
+	bpf_u_int32 net   ; 
+	struct pcap_pkthdr header ; 
+	const u_char *packet ; 
+	
+#define SIZE_ETHERNET 14 
+
+	const struct sniff_ethernet *ethernet  ; 
+	const struct sniff_ip *ip  ;
+	const struct sniff_tcp *tcp  ;
+	const char *payload  ; 
+
+	u_int size_ip ; 
+	u_int size_tcp ; 
+
+
+	printf("Device targeted: %s\n",dev) ; 
+	
+	pcap_t *handle ; 
+
+	handle = pcap_open_live(dev , BUFSIZ, 1 , 1000, errbuf) ; 
+	if(handle ==NULL){
+
+	fprintf(stderr , "Couldn't open device %s: %s\n", dev , errbuf) ; 	
+	return(2)  ; 
+	} 
+
+	if( pcap_datalink(handle) != DLT_EN10MB) { 
+		fprintf(stderr, "Device %s doesn't provide Ethernet headers - not suported \n" , dev) ;
+		return(2) ; 
+	} 
+  	
+	
+	if(pcap_compile(handle, &fp,filter_exp,0,net)==-1){
+		fprintf(stderr, "Couldn't parse filter %s: %s\n",filter_exp, pcap_geterr(handle)) ;
+		return(2) ; 
+	}
+
+	packet = pcap_next(handle, &header) ;
+	
+	ethernet = (struct sniff_ethernet*)(packet) ; 
+	ip = (struct sniff_ip*)(packet+SIZE_ETHERNET) ; 
+	size_ip = IP_HL(ip)*4;
+	if(size_ip<20){
+		printf("Invalid IP header length") ; 
+		return(2) ; 
+	}
+
+	tcp= (struct sniff_tcp*)(packet+SIZE_ETHERNET +size_ip) ; 
+	size_tcp = TH_OFF(tcp)*4 ; 
+	if(size_tcp<20){
+		printf("Invalid TCP HL") ; 
+		return(2) ; 
+	}
+
+	payload=(u_char *)(packet+ SIZE_ETHERNET + size_ip + size_tcp) ; 
+	
+
+
+	pcap_close(handle) ; 
+	
+printf("hello") ; 
+	return 0 ; 
+}

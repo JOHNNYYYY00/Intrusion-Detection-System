@@ -1,0 +1,4 @@
+#!/bin/bash 
+
+
+gcc -o app main.c network.c -lpcap 
