@@ -4,7 +4,7 @@
 #include <pcap.h>
 #include <string.h>
 #include <systemd/sd-journal.h>
-
+#include "logs.h"
 int main(int argc, char *argv[]){
 
 	char *dev ; 
@@ -17,6 +17,8 @@ int main(int argc, char *argv[]){
 	bpf_u_int32 net   ; 
 	struct pcap_pkthdr header ; 
 	const u_char *packet ; 
+
+	init_journal() ;
 
 
 	printf("Device targeted: %s\n",dev) ; 
@@ -48,7 +50,7 @@ int main(int argc, char *argv[]){
 
 	
 
-
+	close_journal();
 	pcap_close(handle) ;	
 
 

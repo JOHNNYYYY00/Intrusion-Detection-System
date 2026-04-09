@@ -4,7 +4,7 @@
 #include <pcap.h>
 #include <sys/types.h>
 #include <systemd/sd-journal.h>
-
+#include "logs.h"
 
 void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char *packet){
 	
@@ -36,6 +36,7 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 		payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp) ;
 	printf("\n------------------------------\n") ; 
 	printf("The source IP address    : %s\n" ,inet_ntoa(ip->ip_src))  ; 
+	printf("The dest IP address 	 : %s\n", inet_ntoa(ip->ip_dst)) ;
 	printf("The source MAC address	 : %2x:%2x:%2x:%2x:%2x:%2x\n",
 			ethernet->ether_shost[0],
 	       		ethernet->ether_shost[1],
@@ -46,7 +47,7 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 //	printf("The source port		 : %d\n", src_port ) ; 
 //	printf("Thee destination port  	 : %d\n", des_port) ; 
 	printf(" The TCP SEQ number	 : %d\n" , tcp->th_seq) ;
-	
+	send_message() ; 	
 
 
 		return  ;
