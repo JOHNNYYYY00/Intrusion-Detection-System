@@ -23,8 +23,10 @@
 
 		const void *data  ;
 		size_t length ; 
+		
+		//Write MESSAGE in field for sd_journal_get_data //
 
-		if(sd_journal_get_data(j, "_KERNEL_DEVICE" , &data, &length)==0){
+		if(sd_journal_get_data(j, "MESSAGE" , &data, &length)==0){
 		printf("%s\n", (const char*)data+8) ; 
 			} 
 		} 
@@ -33,3 +35,8 @@
 		sd_journal_close(j) ; 
 		j=NULL ; 
 		}
+
+	
+void  parse_filter(){
+	return ; 
+}

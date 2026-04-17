@@ -5,6 +5,8 @@
 #include <string.h>
 #include <systemd/sd-journal.h>
 #include "logs.h"
+#include "interface.h"
+#include <stdlib.h>
 int main(int argc, char *argv[]){
 
 	char *dev ; 
@@ -12,14 +14,20 @@ int main(int argc, char *argv[]){
 	dev = pcap_lookupdev(errbuf) ; 
 	char *ICMP = "icmp" ; 
 	struct bpf_program fp ; 
-	char filter_exp[]="port 22" ; 
+	char *filter_exp = malloc(100) ; 
 	bpf_u_int32 mask ; 
 	bpf_u_int32 net   ; 
 	struct pcap_pkthdr header ; 
 	const u_char *packet ; 
-
+	int port ; 
+	int *p_port ; 
+	p_port = &port ;
+	
 	init_journal() ;
 
+		
+	interface_menu(p_port, filter_exp) ; 
+	printf("%s    \n", filter_exp)  ;
 
 	printf("Device targeted: %s\n",dev) ; 
 	

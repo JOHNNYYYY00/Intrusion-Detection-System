@@ -1,4 +1,4 @@
 #!/bin/bash 
 
 
-gcc -o app main.c network.c logs.c  -lpcap -lsystemd 
+gcc -o app main.c network.c logs.c interface.c  -lpcap -lsystemd 
