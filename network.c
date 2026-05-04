@@ -5,6 +5,10 @@
 #include <sys/types.h>
 #include <systemd/sd-journal.h>
 #include "logs.h"
+#include <stdlib.h>
+
+ 
+
 
 void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char *packet){
 	
@@ -13,9 +17,12 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 	const struct sniff_tcp *tcp ; 
 	const u_char *payload ;
 	u_int size_ip ; 
-	u_int size_tcp  ; 
+	u_int size_tcp  ;
+	char* msg_buf = malloc(1000) ; 
 //	u_short src_port = ntohs(tcp->th_sport) ; 
 //	u_short des_port = ntohs(tcp->th_dport) ;
+	extern int* p_port ; 
+	
 
 
 
@@ -47,9 +54,9 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 //	printf("The source port		 : %d\n", src_port ) ; 
 //	printf("Thee destination port  	 : %d\n", des_port) ; 
 	printf(" The TCP SEQ number	 : %d\n" , tcp->th_seq) ;
-	send_message() ; 	
-
-
+	printf("%s\n", 	send_message(msg_buf)) ; 	
+		parse_filter(msg_buf, p_port ) ; 
+			free(msg_buf) ; 
 		return  ;
 
 

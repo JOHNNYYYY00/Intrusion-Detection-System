@@ -7,6 +7,10 @@
 #include "logs.h"
 #include "interface.h"
 #include <stdlib.h>
+
+int port  ; 
+int *p_port  ; 
+
 int main(int argc, char *argv[]){
 
 	char *dev ; 
@@ -19,10 +23,7 @@ int main(int argc, char *argv[]){
 	bpf_u_int32 net   ; 
 	struct pcap_pkthdr header ; 
 	const u_char *packet ; 
-	int port ; 
-	int *p_port ; 
-	p_port = &port ;
-	
+	p_port = &port ;	
 	init_journal() ;
 
 		

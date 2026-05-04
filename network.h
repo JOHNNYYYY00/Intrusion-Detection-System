@@ -1,11 +1,16 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+
+#include "logs.h"
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <pcap.h>
 #define ETHER_ADDR_LEN 6
 #define SIZE_ETHERNET 14
+
+
+extern int* p_port  ; 
 
 /* Ethernet header */
 struct sniff_ethernet {
@@ -27,7 +32,7 @@ struct sniff_ip {
 #define IP_MF 0x2000
 #define IP_OFFMASK 0x1fff
 
-    u_char ip_ttl;
+    
     u_char ip_p;
     u_short ip_sum;
     struct in_addr ip_src, ip_dst;

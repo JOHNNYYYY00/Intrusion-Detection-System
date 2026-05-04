@@ -3,3 +3,6 @@
 when compiling the program you need to end the gcc with -lpcap
 
 when compiling the program also use -lsystemd
+
+
+adjust message buffer to reallocate memory size to the length of MESSAGE field , in logs.c
