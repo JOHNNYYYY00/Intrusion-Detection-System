@@ -4,18 +4,21 @@
 #include <time.h>
 #include <systemd/sd-journal.h>
 #include <pcap.h>
+#include "network.h" 
+#include <stdlib.h>
 
 static sd_journal *j = NULL;
 struct tm current_time = {0} ; 
 struct tm *ctp = &current_time ; 	
-
+struct service configuration ; 
+struct service *config_p  ; 
 
 	
 
-void parse_filter(char* message, int* port) ;
+void parse_filter(char* message) ;
 void update_time()  ; 
 void write_file(); 	
-
+void service_config() ; 
 
 
 int init_journal(){
@@ -46,6 +49,7 @@ char* send_message(char* message ){
 		} 
 
 
+		strcpy(config_p->port_n, "22") ; 
 		sd_journal_next(j)  ; 
 
 		const void *data  ;
@@ -105,10 +109,11 @@ void follow_journal(int* port){
 	char timebuf[64];
 	strftime(timebuf,sizeof(timebuf),"%b %d %H: %M: %S" , localtime(&t)) ; 
 
+	
 	printf("%s %.*s\n",timebuf,msg_len,msg) ; 
 	
 	snprintf(message, sizeof(message), "%.*s", msg_len,msg) ; 
- 	parse_filter(message,port) ; 
+ 	parse_filter(message) ; 
 	}
 }
 }
@@ -126,24 +131,22 @@ void close_journal(){
 
 
 
-void  parse_filter(char* message, int* port  ){
-
+void  parse_filter(char* message ){
+	service_config() ; 
 	
-	char str[16] 	 ; 
-	sprintf(str, "%d" ,*port) ; 
-	char* sub_msg = strstr(message, str) ;
-		
-	if(sub_msg || strstr(message, "sshd")|| strstr(message, "ssh") ){
-		printf("[MATCH]%s\n", message) ; 
-		printf("\n CHECK CHECK CHECK DIS HOE\n") ; 
+	if(	 strstr(message, config_p->sname )
+		|| strstr(message, config_p->login)
+	 	|| strstr(message, config_p->failure)
+		|| strstr(message, config_p->port_n)){
 		
 		write_file()  ; 
-	}else{
-		return ;  
+		}else{
+			return ;  
 
 	}
 	return ; 
 }
+
 
 
 
@@ -172,7 +175,7 @@ void write_file( ){
 	 
 	FILE *fp  ; 
 	fp = fopen("LOGS.txt","a") ; 
-	fprintf(fp, "\n the year is: %d ", ctp->tm_hour);  
+	fprintf(fp, "\n %d:%d:%d ", ctp->tm_hour, ctp->tm_min,ctp->tm_sec);  
 	fclose(fp) ; 
 	
 }
@@ -181,6 +184,22 @@ void write_file( ){
 
 
 
+
+void service_config(){
+	config_p = &configuration ;
+	if(get_port() == "22" ){
+	
+		strcpy(config_p->sname, "ssh") ; 
+		strcpy(config_p->login, "login") ; 
+		strcpy(config_p->failure,"fail") ;
+		strcpy(config_p->port_n,"22")  ; 
+		
+		printf("hello the port is %d" , get_port() ) ; 
+	}else{
+		printf("Invalid service configuation") ; 
+}
+return; 
+}
 
 
 
