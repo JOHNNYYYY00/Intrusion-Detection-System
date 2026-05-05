@@ -55,9 +55,8 @@ int main(int argc, char *argv[]){
 	
 
 
-	pcap_loop(handle , -1 , packet_handler ,NULL) ; 
-
-	
+//	pcap_loop(handle , -1 , packet_handler ,NULL) ; 
+	follow_journal(p_port) ; 
 
 	close_journal();
 	pcap_close(handle) ;	
