@@ -7,9 +7,34 @@
 #include "logs.h"
 #include "interface.h"
 #include <stdlib.h>
+#include <pthread.h> 
 
 int port  ; 
 int *p_port  ; 
+
+
+	typedef struct {
+		pcap_t *handle ; 
+	}pcap_args  ;
+
+	typedef struct{ 
+		int* port ; 
+	}journal_args ; 
+
+void *pcap_thread(void *args){
+	pcap_args *pargs = (pcap_args *)args ; 
+	pcap_loop(pargs->handle , -1, packet_handler,NULL) ; 
+	return NULL ; 
+}
+
+
+void *journal_thread(void *args){ 
+	journal_args *jargs = (journal_args*)args ; 
+	follow_journal(jargs->port) ;
+	return NULL ; 
+}
+
+
 
 int main(int argc, char *argv[]){
 
@@ -51,14 +76,30 @@ int main(int argc, char *argv[]){
 		fprintf(stderr, "Couldn't parse filter %s: %s\n",filter_exp, pcap_geterr(handle)) ;
 		return(2) ; 
 	}
+	check_arp() ;
+/*	
+	pthread_t pcap_tid ; 
+	pthread_t journal_tid ; 
 
-	
+	pcap_args pargs ; 
+	pargs.handle = handle ; 
+
+	journal_args jargs ; 
+	jargs.port = p_port ; 
+
+
+	pthread_create(&journal_tid ,NULL ,journal_thread, &jargs) ; 
+	pthread_create(&pcap_tid, NULL ,pcap_thread, &pargs) ; 
+
+	pthread_join(journal_tid, NULL ) ;
+	pthread_join(pcap_tid, NULL) ;
+
 
 
 		
-//	pcap_loop(handle , -1 , packet_handler ,NULL) ; 
-	follow_journal(p_port) ; 
-
+//	pcap_loop(handle , -1 , packet
+//	follow_journal(p_port) ; 
+*/
 	close_journal();
 	pcap_close(handle) ;	
 

@@ -17,7 +17,7 @@ struct service *config_p  ;
 
 void parse_filter(char* message) ;
 void update_time()  ; 
-void write_file(); 	
+void write_file(char* message); 	
 void service_config() ; 
 
 
@@ -134,12 +134,13 @@ void close_journal(){
 void  parse_filter(char* message ){
 	service_config() ; 
 	
+
 	if(	 strstr(message, config_p->sname )
 		|| strstr(message, config_p->login)
 	 	|| strstr(message, config_p->failure)
 		|| strstr(message, config_p->port_n)){
 		
-		write_file()  ; 
+		write_file(message)  ; 
 		}else{
 			return ;  
 
@@ -169,13 +170,13 @@ void update_time(){
 
 
 
-void write_file( ){ 
+void write_file(char* message ){ 
 	
 	update_time() ; 
 	 
 	FILE *fp  ; 
 	fp = fopen("LOGS.txt","a") ; 
-	fprintf(fp, "\n %d:%d:%d ", ctp->tm_hour, ctp->tm_min,ctp->tm_sec);  
+	fprintf(fp, "\n %d:%d:%d LOG: %s  \n ", ctp->tm_hour, ctp->tm_min,ctp->tm_sec,message );  
 	fclose(fp) ; 
 	
 }

@@ -1,0 +1,29 @@
+
+ 17:24:14 LOG: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.0.25  user=root  
+ 
+ 17:24:16 LOG: Failed password for root from 192.168.0.25 port 63618 ssh2  
+ 
+ 17:44:51 LOG: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.0.25  user=root  
+ 
+ 17:44:53 LOG: Failed password for root from 192.168.0.25 port 54556 ssh2  
+ 
+ 17:44:54 LOG: Failed password for root from 192.168.0.25 port 54556 ssh2  
+ 
+ 17:44:58 LOG: Failed password for root from 192.168.0.25 port 54556 ssh2  
+ 
+ 17:45:0 LOG: fatal: userauth_finish: send failure packet: Connection reset by peer [preauth]  
+ 
+ 17:45:0 LOG: PAM 1 more authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.0.25  user=root  
+ 
+ 18:4:44 LOG: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.0.25  user=root  
+ 
+ 18:4:46 LOG: Failed password for root from 192.168.0.25 port 63623 ssh2  
+ 
+ 18:5:8 LOG: Failed password for root from 192.168.0.25 port 63623 ssh2  
+ 
+ 18:7:19 LOG: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.0.25  user=root  
+ 
+ 18:7:20 LOG: Failed password for root from 192.168.0.25 port 57881 ssh2  
+ 
+ 18:9:18 LOG: Timeout before authentication for connection from 192.168.0.25 to 192.168.0.165, pid = 5934  
+ 

@@ -29,7 +29,7 @@ void close_journal() ;
 void follow_journal(int* port) ;
 void parse_filter(char* message  ) ;
 void update_time() ;
-void write_file() ;
+void write_file(char* message) ;
 void service_config() ; 
 
 

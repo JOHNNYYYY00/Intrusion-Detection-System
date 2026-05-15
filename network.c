@@ -6,7 +6,7 @@
 #include <systemd/sd-journal.h>
 #include "logs.h"
 #include <stdlib.h>
-
+#include <regex.h> 
  
 
 
@@ -64,5 +64,40 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 
 
 int get_port(){ 
-return *p_port ; 
+	return *p_port ; 
 }
+
+
+
+
+void check_arp(){ 
+ 	const char *pattern = "^([0-9A-Fa-f]{2}[:-]{5}([0-9A-Fa-f]{2})$";
+	FILE *fp ; 
+	char line[256] ;
+       	int number = 0  ;
+	int *np  = &number  ;  
+	int  i = 0 ;
+	fp = fopen("/proc/net/arp","r") ;
+       	regex_t regex  ;
+ 		
+
+	if (fp==NULL){
+		printf("No file found at /proc/net/arp" ) ; 
+	}
+	else{
+		while(fgets(line,sizeof(line),fp)){
+		number++ ; 	 
+		}
+		
+	}
+	rewind(fp) ; 
+	char devices[*np][256] ; 
+	while(fgets(line,sizeof(line),fp)){
+  	       strcpy(devices[i],line) ;
+	       printf("\n%s" ,devices[i++]) ; 	
+
+	
+	}
+}
+
+
