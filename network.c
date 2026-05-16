@@ -121,14 +121,14 @@ void check_arp(){
 		i++ ; 
 		
 	
-		printf("\n %d Match found : %s\n",i,  devices[i]) ; 
-		regfree(&regex) ; 
+		printf("\n %d Match found : %s\n",i,  devices[i-1]) ; 
 		} else { 
 			printf("\nNo match found") ; 
 			}	
 	
 		 
 		}
+	regfree(&regex) ; 
  	return ;
 }
 
