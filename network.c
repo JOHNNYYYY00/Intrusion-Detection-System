@@ -71,15 +71,18 @@ int get_port(){
 
 
 void check_arp(){ 
- 	const char *pattern = "^([0-9A-Fa-f]{2}[:-]{5}([0-9A-Fa-f]{2})$";
+ 	const char *pattern = "([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}";
 	FILE *fp ; 
 	char line[256] ;
        	int number = 0  ;
 	int *np  = &number  ;  
 	int  i = 0 ;
 	fp = fopen("/proc/net/arp","r") ;
-       	regex_t regex  ;
- 		
+       	regex_t regex ; 
+	regmatch_t match ; 
+ 	int start ; 
+	int end ; 
+	int len ; 
 
 	if (fp==NULL){
 		printf("No file found at /proc/net/arp" ) ; 
@@ -94,10 +97,41 @@ void check_arp(){
 	char devices[*np][256] ; 
 	while(fgets(line,sizeof(line),fp)){
   	       strcpy(devices[i],line) ;
-	       printf("\n%s" ,devices[i++]) ; 	
-
 	
 	}
+
+	
+
+	if(regcomp(&regex,pattern, REG_EXTENDED)!= 0){
+		fprintf(stderr,"FAILED TO COMPILE REGEX") ; 
+		return ; 
+		}
+		
+		rewind(fp) ; 
+		
+	while(fgets(line, sizeof(line),fp)){
+			
+	if(regexec(&regex,line,1,&match,0)==0){
+		 start = match.rm_so ;
+		 end = match.rm_eo ; 
+		 len = end - start ; 
+	
+		strncpy(devices[i], line + match.rm_so , len ) ;
+		devices[i][len]='\0' ; 
+		i++ ; 
+		
+	
+		printf("\n %d Match found : %s\n",i,  devices[i]) ; 
+		regfree(&regex) ; 
+		} else { 
+			printf("\nNo match found") ; 
+			}	
+	
+		 
+		}
+ 	return ;
 }
+
+
 
 
