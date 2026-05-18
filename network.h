@@ -77,6 +77,8 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header,const u_char 
 
 void check_arp() ; 
 
-int get_port() ; 
+int get_port() ;
+
+void check_dupe(char devices[][256], int length) ;
 
 #endif

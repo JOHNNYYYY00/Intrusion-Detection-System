@@ -10,7 +10,7 @@
  
 
 
-void check_dupe(char devices[][256], int length) ; 
+void check_dupe(char devices[][256]) ; 
 
 
 void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char *packet){
@@ -131,8 +131,8 @@ void check_arp(){
 	
 		 
 		}
-		int length = *np ; 
-		check_dupe(devices, length) ; 
+
+		check_dupe(devices) ; 
 
 	regfree(&regex) ; 
  	return ;
@@ -141,17 +141,17 @@ void check_arp(){
  
 
 
-void check_dupe(char devices[][256], int length){
+void check_dupe(char devices[][256]){
 	char* entry[256] ; 
 
 
-	for(int i = 0  ; i< length  ; i++){
+	for(int i = 0  ; i< sizeof(devices) ; i++){
 		int y = 0 ; 
-		for(int  j = 0 ; j < length;j++){
-		if(strcmp(devices[i] , devices[j])==0){
+		for(int  j = 0 ; j < sizeof(devices);j++){
+		if(strcmp(devices[i] , devices[j])){
 		y++ ; 
-		if(y>=2){
-		printf("\nfound a duplicate,  %s  :    %s", devices[i], devices[j]) ;
+		if(y==2){
+		printf("found a duplicate") ;
 		y= 0 ;	
 				}
 
