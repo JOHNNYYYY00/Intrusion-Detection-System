@@ -7,13 +7,22 @@
 #include "logs.h"
 #include <stdlib.h>
 #include <regex.h> 
- 
+#include <stdbool.h> 
+#include <string.h> 
+
+int syn_number  ; 
+int *synp = &syn_number ; 
 
 
+
+void check_arp() ; 
 void check_dupe(char devices[][256], int length) ; 
+void check_tcp(struct sniff_tcp *tcp); 
 
 
 void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char *packet){
+
+
 	
 	const struct sniff_ethernet *ethernet ; 
 	const struct sniff_ip *ip ; 
@@ -45,7 +54,7 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 
 		payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp) ;
 	printf("\n------------------------------\n") ; 
-	printf("The source IP address    : %s\n" ,inet_ntoa(ip->ip_src))  ; 
+/*	printf("The source IP address    : %s\n" ,inet_ntoa(ip->ip_src))  ; 
 	printf("The dest IP address 	 : %s\n", inet_ntoa(ip->ip_dst)) ;
 	printf("The source MAC address:	 : %2x:%2x:%2x:%2x:%2x:%2x\n",
 			ethernet->ether_shost[0],
@@ -57,12 +66,27 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 //	printf("The source port		 : %d\n", src_port ) ; 
 //	printf("Thee destination port  	 : %d\n", des_port) ; 
 	printf(" The TCP SEQ number	 : %d\n" , tcp->th_seq) ;
-	//follow_journal(p_port) ; 
+	//follow_journal(p_port) ;*/
+	check_tcp(tcp) ; 
+	check_arp() ; 
 		return  ;
 
 
 
 }
+
+
+void check_tcp(struct sniff_tcp *tcp){
+	
+
+
+	if(tcp->th_flags == TH_SYN){ 
+	syn_number++ ;
+
+	printf("\n\n\nSYN NUMBER:  %d\n\n\n\n", *synp) ; 
+	}
+}	 
+	
 
 
 
@@ -103,6 +127,8 @@ void check_arp(){
 	
 	}
 
+ 
+
 	
 
 	if(regcomp(&regex,pattern, REG_EXTENDED)!= 0){
@@ -124,9 +150,9 @@ void check_arp(){
 		i++ ; 
 		
 	
-		printf("\n %d Match found : %s\n",i,  devices[i-1]) ; 
+//		printf("\n %d Match found : %s\n",i,  devices[i-1]) ; 
 		} else { 
-			printf("\nNo match found") ; 
+		//	printf("\nNo match found") ; 
 			}	
 	
 		 
@@ -135,11 +161,13 @@ void check_arp(){
 		check_dupe(devices, length) ; 
 
 	regfree(&regex) ; 
+	fclose(fp) ; 
  	return ;
 }
 
  
 
+/*CHECKS A 2D STRING ARRAY CONTAINING MAC ADDRESSES IN ARP TABLE FOR DUPLICATES*/
 
 void check_dupe(char devices[][256], int length){
 	char* entry[256] ; 
@@ -153,11 +181,20 @@ void check_dupe(char devices[][256], int length){
 		if(y>=2){
 		printf("\nfound a duplicate,  %s  :    %s", devices[i], devices[j]) ;
 		y= 0 ;	
-				}
+			FILE *fp ; 
+			char line[256] ; 
+			fp=fopen("/proc/net/arp","r") ; 
+				
+			while(fgets(line,sizeof(line),fp)){
+				if(strstr(line , devices[i])!=NULL){
+				strcat(line, "^WARNING DUPLIATE MAC IN ARP TABLE^") ; 
+					write_file(line) ;  
+						}
 
-  			}
+  					}
+				}
+			}
 		}
+
 	}
 }
-
-

@@ -41,14 +41,14 @@ int init_journal(){
 
 
 
-	
+/*FUNCTION BELOW IS NOT USED AT ALL*/	
 char* send_message(char* message ){ 
 		if(!j){
 		printf("No journal file found") ; 
 		return(NULL); 
 		} 
 
-
+	
 		strcpy(config_p->port_n, "22") ; 
 		sd_journal_next(j)  ; 
 
@@ -80,10 +80,12 @@ char* send_message(char* message ){
 		
 					
 			return(message) ; 
-		//	printf("%.*s\n",(int)(length-8),(const char *)data+8) ;	
+		//	printf("%.*s\n,(int)(length-8),(const char *)data+8) ;	
 			} 
 		}
-		
+
+
+/*TO FOLLOW JOURNAL LOGS AND UPDATE*/		
 void follow_journal(int* port){
 	const void *data ;
 	size_t length ; 
@@ -130,6 +132,7 @@ void close_journal(){
 
 
 
+/*PARSE FILTER CHECKS FOR SERVICE CONFIGURATION STRUCT (struct service)  BEFORE WRITING TO A FILE*/
 
 void  parse_filter(char* message ){
 	service_config() ; 
@@ -169,6 +172,7 @@ void update_time(){
 
 
 
+/*WRITE TO LOGS.txt A GIVEN STRING*/
 
 void write_file(char* message ){ 
 	
@@ -185,22 +189,28 @@ void write_file(char* message ){
 
 
 
+/*CONFIGURE A STRUCT TO PARSE THE VALUES OF THE CHOSEN SERVICE*/
 
 void service_config(){
+
 	config_p = &configuration ;
-	if(get_port() == "22" ){
+
+		if(get_port() == "22" ){
 	
-		strcpy(config_p->sname, "ssh") ; 
-		strcpy(config_p->login, "login") ; 
-		strcpy(config_p->failure,"fail") ;
-		strcpy(config_p->port_n,"22")  ; 
+			strcpy(config_p->sname, "ssh") ; 
+			strcpy(config_p->login, "login") ; 
+			strcpy(config_p->failure,"fail") ;
+			strcpy(config_p->port_n,"22")  ; 
 		
-		printf("hello the port is %d" , get_port() ) ; 
-	}else{
-		printf("Invalid service configuation") ; 
-}
-return; 
-}
+			printf("hello the port is %d" , get_port() ) ; 
+		}else{
+			printf("Invalid service configuation") ; 
+		
+			}
+		return ; 
+		}
+		
+
 
 
 

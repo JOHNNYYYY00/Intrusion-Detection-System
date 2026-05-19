@@ -7,10 +7,14 @@ when compiling the program also use -lsystemd
 
 adjust message buffer to reallocate memory size to the length of MESSAGE field , in logs.c
 
+
+
+
 create a file which is written to when the server runs, appending the date and time of a server log
 (completed above) 
 
 create a file which will detect brute force attempts
+
 
 create a function  which checks for  errors which runs in the follow journal logs function , which then calls the write file function and get time function to put a time descriptive log in a text file . 
 (completed above)
@@ -20,9 +24,17 @@ RUN TWO SIMULATENOUS THREADS ONE FOR THE PCAP LOOP AND ONE FOR THE SYSTEMD LOG L
 (completed above)  
 
 
-complete functionality to check for arp poisoning, and then ban that mac address from connecting to our ting
+complete functionality to check for arp poisoning, and then ban that mac address from connecting to our device
+(functionality for checking dupe mac works, also updates logs,)
+(COMPLETED ABOVE)  
 
+FOR ARP SPOOF
+TODO: need to drop connection and flush arp table from duped address, can run function in loop handler 
+create a timer to intermitdly check mac connections ;
 
+FOR SYN FLOODING: 
+create a function to check tcp header for syn flags  
+write a log if syn connections exceeds threshold 
 
 
 

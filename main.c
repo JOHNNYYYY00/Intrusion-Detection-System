@@ -76,8 +76,8 @@ int main(int argc, char *argv[]){
 		fprintf(stderr, "Couldn't parse filter %s: %s\n",filter_exp, pcap_geterr(handle)) ;
 		return(2) ; 
 	}
-	check_arp() ;
-/*	
+//	check_arp() ;
+	
 	pthread_t pcap_tid ; 
 	pthread_t journal_tid ; 
 
@@ -97,9 +97,9 @@ int main(int argc, char *argv[]){
 
 
 		
-//	pcap_loop(handle , -1 , packet
-//	follow_journal(p_port) ; 
-*/
+	pcap_loop(handle , -1 , packet_handler,NULL) ; 
+	follow_journal(p_port) ; 
+
 	close_journal();
 	pcap_close(handle) ;	
 
