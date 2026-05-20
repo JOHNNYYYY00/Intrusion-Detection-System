@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <systemd/sd-journal.h> 
-
+#include <stdbool.h>
 
 /* Service Structs */
 
@@ -31,5 +31,5 @@ void parse_filter(char* message  ) ;
 void update_time() ;
 void write_file(char* message) ;
 void service_config() ; 
-
+bool set_timer(int time) ;
 

@@ -17,7 +17,7 @@ int *synp = &syn_number ;
 
 void check_arp() ; 
 void check_dupe(char devices[][256], int length) ; 
-void check_tcp(struct sniff_tcp *tcp); 
+void check_tcp(struct sniff_tcp *tcp, struct sniff_ethernet *ethernet); 
 
 
 void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char *packet){
@@ -67,8 +67,12 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 //	printf("Thee destination port  	 : %d\n", des_port) ; 
 	printf(" The TCP SEQ number	 : %d\n" , tcp->th_seq) ;
 	//follow_journal(p_port) ;*/
-	check_tcp(tcp) ; 
-	check_arp() ; 
+	if(set_timer(1)){
+		check_tcp(tcp,ethernet) ; 
+	}
+			
+			
+	if(set_timer(5)){check_arp();} ; 
 		return  ;
 
 
@@ -76,17 +80,28 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 }
 
 
-void check_tcp(struct sniff_tcp *tcp){
+void check_tcp(struct sniff_tcp *tcp, struct sniff_ethernet *ethernet){
 	
-
+	update_time() ; 
+		
+ 
 
 	if(tcp->th_flags == TH_SYN){ 
 	syn_number++ ;
+		}
 
-	printf("\n\n\nSYN NUMBER:  %d\n\n\n\n", *synp) ; 
-	}
-}	 
-	
+//	if(syn_number>100){
+	printf("\n\n\nSYN NUMBER:     %d  :   %2x:%2x:%2x:%2x:%2x:%2x \n\n\n\n", 
+		 *synp, ethernet->ether_shost[0],
+			 ethernet->ether_shost[1],
+			 ethernet->ether_shost[2],
+			 ethernet->ether_shost[3],
+			 ethernet->ether_shost[4],
+			 ethernet->ether_shost[5]) ; 
+	    write_file("SUSPECTED SYN FLOOD") ; 
+//		}	
+		return ; 
+	}	 	
 
 
 
@@ -178,9 +193,12 @@ void check_dupe(char devices[][256], int length){
 		for(int  j = 0 ; j < length;j++){
 		if(strcmp(devices[i] , devices[j])==0){
 		y++ ; 
-		if(y>=2){
+
+
+	//this is set to three because having a vm sets the device as 2 repeat mac addresses immediately,	
+		if(y>=3){
 		printf("\nfound a duplicate,  %s  :    %s", devices[i], devices[j]) ;
-		y= 0 ;	
+		y= 0 ;
 			FILE *fp ; 
 			char line[256] ; 
 			fp=fopen("/proc/net/arp","r") ; 

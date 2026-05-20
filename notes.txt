@@ -30,14 +30,22 @@ complete functionality to check for arp poisoning, and then ban that mac address
 
 FOR ARP SPOOF
 TODO: need to drop connection and flush arp table from duped address, can run function in loop handler 
-create a timer to intermitdly check mac connections ;
+create a timer to intermitdly check mac connections, every 5 seconds ;
 
 FOR SYN FLOODING: 
 create a function to check tcp header for syn flags  
-write a log if syn connections exceeds threshold 
+write a log if syn connections exceeds threshold, figure out what threshold is in a 5sec interval 
+
+CREATE FUNCTION WHICH TAKES PARAM TIME AND A FUNCTION,
+RUNS FUNCTION EVERY TIME THE TIME ARG PASSES
+
+^CREATE FUNFCTION WHICH TAKES A VOID FUNC AND A TIME PARAMTER TO CHECK FOR A THING WITHIN A FREQUENCY^
 
 
 
 -------------------------------------------------------------------------------------------
 how to run ettercap
-sudo ettercap -T -S -i ETH -M arp:remote /*.*.*.*// /*.*.*.*// (last 4 octets destination)  
+sudo ettercap -T -S -i ETH -M arp:remote /*.*.*.*// /*.*.*.*// (last 4 octets destination) 
+
+how to run hping3
+sudo hping3 -S -p 22 --flood --rand-source *destination ip*  

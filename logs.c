@@ -6,6 +6,7 @@
 #include <pcap.h>
 #include "network.h" 
 #include <stdlib.h>
+#include <stdbool.h>
 
 static sd_journal *j = NULL;
 struct tm current_time = {0} ; 
@@ -214,7 +215,14 @@ void service_config(){
 
 
 
-
+bool set_timer( int time){
+		update_time() ; 
+		if(ctp->tm_sec%time==0){
+		       return(1) ;  
+		}else{
+			return(0) ; 
+			}		
+}
 
 
 

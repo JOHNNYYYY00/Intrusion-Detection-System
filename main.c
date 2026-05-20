@@ -41,7 +41,6 @@ int main(int argc, char *argv[]){
 	char *dev ; 
 	char errbuf[PCAP_ERRBUF_SIZE] ;  
 	dev = pcap_lookupdev(errbuf) ; 
-	char *ICMP = "icmp" ; 
 	struct bpf_program fp ; 
 	char *filter_exp = malloc(100) ; 
 	bpf_u_int32 mask ; 

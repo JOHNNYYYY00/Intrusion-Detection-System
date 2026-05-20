@@ -81,6 +81,7 @@ int get_port() ;
 
 void check_dupe(char devices[][256], int length) ;
 
-void check_tcp(struct sniff_tcp *tcp) ; 
+void check_tcp(struct sniff_tcp *tcp, struct sniff_ethernet *ethernet) ; 
+
 
 #endif
