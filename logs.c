@@ -20,7 +20,10 @@ void parse_filter(char* message) ;
 void update_time()  ; 
 void write_file(char* message); 	
 void service_config() ; 
+void check_bf(char *message) ; 
 
+int count ; 
+int *countp = &count;
 
 int init_journal(){
 
@@ -88,37 +91,39 @@ char* send_message(char* message ){
 
 /*TO FOLLOW JOURNAL LOGS AND UPDATE*/		
 void follow_journal(int* port){
-	const void *data ;
-	size_t length ; 
-	char message[512] ; 
+const void *data ;
+size_t length ; 
+char message[512] ; 
 	
-	while(1){
-	int r = sd_journal_wait(j,1000000) ;
-	if(r<0){
-	 printf("Journal error: %s\n", strerror(-r)) ;
-	 break ; 
+		while(1){
+		int r = sd_journal_wait(j,1000000) ;
+		if(r<0){
+		 printf("Journal error: %s\n", strerror(-r)) ;
+		 break ; 
+		}
+
+		while(sd_journal_next(j) > 0) {
+		if(sd_journal_get_data(j,"MESSAGE",&data,&length) < 0)
+		continue; 
+
+		const char *msg = (const char *)data+8 ; 
+		int msg_len = (int)(length - 8) ;
+
+			uint64_t usec ; 
+			sd_journal_get_realtime_usec(j,&usec) ; 
+			time_t t = usec / 1000000 ;
+			char timebuf[64];
+			strftime(timebuf,sizeof(timebuf),"%b %d %H: %M: %S" , localtime(&t)) ; 
+
+
+	
+			printf("%s %.*s\n",timebuf,msg_len,msg) ; 
+	
+			snprintf(message, sizeof(message), "%.*s", msg_len,msg) ; 
+ 			parse_filter(message) ; 
+			check_bf(message) ; 
+		}
 	}
-
-	while(sd_journal_next(j) > 0) {
-	 if(sd_journal_get_data(j,"MESSAGE",&data,&length) < 0)
-	  continue; 
-
-	const char *msg = (const char *)data+8 ; 
-	int msg_len = (int)(length - 8) ;
-
-	uint64_t usec ; 
-	sd_journal_get_realtime_usec(j,&usec) ; 
-	time_t t = usec / 1000000 ;
-	char timebuf[64];
-	strftime(timebuf,sizeof(timebuf),"%b %d %H: %M: %S" , localtime(&t)) ; 
-
-	
-	printf("%s %.*s\n",timebuf,msg_len,msg) ; 
-	
-	snprintf(message, sizeof(message), "%.*s", msg_len,msg) ; 
- 	parse_filter(message) ; 
-	}
-}
 }
 
 
@@ -140,11 +145,17 @@ void  parse_filter(char* message ){
 	
 
 	if(	 strstr(message, config_p->sname )
+
+
+
+
+
 		|| strstr(message, config_p->login)
 	 	|| strstr(message, config_p->failure)
 		|| strstr(message, config_p->port_n)){
 		
 		write_file(message)  ; 
+		
 		}else{
 			return ;  
 
@@ -154,9 +165,17 @@ void  parse_filter(char* message ){
 
 
 
+void check_bf(char* message){
+	if(strstr(message, "fail")){
+	count++ ; 
+	}
+	if(set_timer(5)&&*countp>5){
+	write_file("WARNING: POTENTIAL BRUTE FORCE ATTEMPTED") ; 
+	count= 0 ; 
+	}
+	
 
-
-
+}
 
 void update_time(){
 	if(ctp!=NULL){
@@ -196,7 +215,7 @@ void service_config(){
 
 	config_p = &configuration ;
 
-		if(get_port() == "22" ){
+		if(get_port() == 22 ){
 	
 			strcpy(config_p->sname, "ssh") ; 
 			strcpy(config_p->login, "login") ; 
@@ -226,4 +245,13 @@ bool set_timer( int time){
 
 
 
-
+bool write_throttle(int seconds){
+	static int last_triggered = -1 ; 
+	update_time() ; 
+	if(ctp->tm_sec - last_triggered>=seconds){
+		last_triggered = ctp->tm_sec ; 
+		return true ; 
+	}
+	return false ; 
+}
+		

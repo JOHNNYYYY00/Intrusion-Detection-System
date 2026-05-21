@@ -31,8 +31,8 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 	u_int size_ip ; 
 	u_int size_tcp  ;
 	char* msg_buf = malloc(1024) ; 
-//	u_short src_port = ntohs(tcp->th_sport) ; 
-//	u_short des_port = ntohs(tcp->th_dport) ;
+	u_short src_port = ntohs(tcp->th_sport) ; 
+	u_short des_port = ntohs(tcp->th_dport) ;
 	extern int* p_port ;
 	
 
@@ -54,7 +54,7 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 
 		payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + size_tcp) ;
 	printf("\n------------------------------\n") ; 
-/*	printf("The source IP address    : %s\n" ,inet_ntoa(ip->ip_src))  ; 
+	printf("The source IP address    : %s\n" ,inet_ntoa(ip->ip_src))  ; 
 	printf("The dest IP address 	 : %s\n", inet_ntoa(ip->ip_dst)) ;
 	printf("The source MAC address:	 : %2x:%2x:%2x:%2x:%2x:%2x\n",
 			ethernet->ether_shost[0],
@@ -63,16 +63,13 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 			ethernet->ether_shost[3],
 			ethernet->ether_shost[4],
 			ethernet->ether_shost[5]) ;
-//	printf("The source port		 : %d\n", src_port ) ; 
-//	printf("Thee destination port  	 : %d\n", des_port) ; 
+	printf("The source port		 : %d\n", src_port ) ; 
+	printf("Thee destination port  	 : %d\n", des_port) ; 
 	printf(" The TCP SEQ number	 : %d\n" , tcp->th_seq) ;
-	//follow_journal(p_port) ;*/
-	if(set_timer(1)){
-		check_tcp(tcp,ethernet) ; 
-	}
+	if(set_timer(1)){check_tcp(tcp,ethernet);}
 			
 			
-	if(set_timer(5)){check_arp();} ; 
+	check_arp(); 
 		return  ;
 
 
@@ -83,23 +80,33 @@ void packet_handler(u_char *user, const struct pcap_pkthdr *header, const u_char
 void check_tcp(struct sniff_tcp *tcp, struct sniff_ethernet *ethernet){
 	
 	update_time() ; 
-		
- 
+	char message[512] = "SUSPECTED SYN FLOOD FROM HOST: " ; 	
+ 	char mac[48] ; 
 
 	if(tcp->th_flags == TH_SYN){ 
 	syn_number++ ;
-		}
+	}
 
-//	if(syn_number>100){
-	printf("\n\n\nSYN NUMBER:     %d  :   %2x:%2x:%2x:%2x:%2x:%2x \n\n\n\n", 
-		 *synp, ethernet->ether_shost[0],
-			 ethernet->ether_shost[1],
-			 ethernet->ether_shost[2],
-			 ethernet->ether_shost[3],
-			 ethernet->ether_shost[4],
-			 ethernet->ether_shost[5]) ; 
-	    write_file("SUSPECTED SYN FLOOD") ; 
-//		}	
+	if(syn_number>100&& tcp->th_flags == TH_SYN && write_throttle(1)){
+	    
+		snprintf(mac, sizeof(mac),"%2x:%2x:%2x:%2x:%2x:%2x",
+				ethernet->ether_shost[0],
+				ethernet->ether_shost[1],
+				ethernet->ether_shost[2],
+				ethernet->ether_shost[3],
+				ethernet->ether_shost[4],
+				ethernet->ether_shost[5]
+				 ) ;
+
+		snprintf(message,sizeof(message),"%s  : NUMBER OF SYN PACKETS RECEIVED:  %d", mac , *synp) ; 
+			
+		
+			
+		write_file(message) ;
+	//     	drop_tcp(mac)	
+		*synp= 0 ; 
+		}
+			
 		return ; 
 	}	 	
 
@@ -139,7 +146,8 @@ void check_arp(){
 	char devices[*np][256] ; 
 	while(fgets(line,sizeof(line),fp)){
   	       strcpy(devices[i],line) ;
-	
+	        
+			//remove the i++ if errors 	
 	}
 
  
@@ -196,7 +204,7 @@ void check_dupe(char devices[][256], int length){
 
 
 	//this is set to three because having a vm sets the device as 2 repeat mac addresses immediately,	
-		if(y>=3){
+		if(y>=2 && write_throttle(1)){
 		printf("\nfound a duplicate,  %s  :    %s", devices[i], devices[j]) ;
 		y= 0 ;
 			FILE *fp ; 
@@ -206,13 +214,20 @@ void check_dupe(char devices[][256], int length){
 			while(fgets(line,sizeof(line),fp)){
 				if(strstr(line , devices[i])!=NULL){
 				strcat(line, "^WARNING DUPLIATE MAC IN ARP TABLE^") ; 
-					write_file(line) ;  
+					write_file(line) ; 
+				 
 						}
 
   					}
+					fclose(fp) ;
+					return ; 
 				}
 			}
 		}
 
 	}
 }
+
+
+
+

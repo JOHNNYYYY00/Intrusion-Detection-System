@@ -32,4 +32,5 @@ void update_time() ;
 void write_file(char* message) ;
 void service_config() ; 
 bool set_timer(int time) ;
-
+void check_bf(char* message) ; 
+bool write_throttle(int seconds) ; 
